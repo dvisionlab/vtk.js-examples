@@ -16,7 +16,8 @@
     "dev:mpr": "EXAMPLE=mpr.js webpack-dev-server --mode=development",
     "dev:mpr2": "EXAMPLE=mpr2.js webpack-dev-server --mode=development",
     "dev:vue-mpr": "EXAMPLE=vue-mpr.js webpack-dev-server --mode=development",
-    "dev:mpr-main": "EXAMPLE=mpr-main.js webpack-dev-server --mode=development"
+    "dev:mpr-main": "EXAMPLE=mpr-main.js webpack-dev-server --mode=development",
+    "dev:custom-shader": "EXAMPLE=custom-shader.js webpack-dev-server --mode=development"
   },
   "author": "",
   "license": "BSD-3-Clause",
