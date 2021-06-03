@@ -1,4 +1,13 @@
+import "regenerator-runtime/runtime";
+// Load the rendering pieces we want to use (for both WebGL and WebGPU)
+import "vtk.js/Sources/Rendering/Profiles/Volume";
+
 import vtkGenericRenderWindow from "vtk.js/Sources/Rendering/Misc/GenericRenderWindow";
+
+// Force DataAccessHelper to have access to various data source
+import "vtk.js/Sources/IO/Core/DataAccessHelper/HtmlDataAccessHelper";
+import "vtk.js/Sources/IO/Core/DataAccessHelper/HttpDataAccessHelper";
+import "vtk.js/Sources/IO/Core/DataAccessHelper/JSZipDataAccessHelper";
 
 import vtkVolume from "vtk.js/Sources/Rendering/Core/Volume";
 import vtkVolumeMapper from "vtk.js/Sources/Rendering/Core/VolumeMapper";
@@ -27,14 +36,20 @@ actor.setMapper(mapper);
 
 // --- load remote dataset ---
 
-const reader = vtkHttpDataSetReader.newInstance({ fetchGzip: true });
+const reader = vtkHttpDataSetReader.newInstance({
+  fetchGzip: true
+});
 
 // wire up the reader to the mapper
 mapper.setInputConnection(reader.getOutputPort());
 
 reader
-  .setUrl("https://kitware.github.io/vtk-js/data/volume/LIDC2.vti")
-  .then(() => reader.loadData())
+  .setUrl("https://kitware.github.io/vtk-js/data/volume/LIDC2.vti", {
+    fullPath: true,
+    // compression: "zip",
+    loadData: true
+  })
+  //   .then(() => reader.loadData())
   .then(() => {
     // --- Add volume actor to scene ---
     renderer.addVolume(actor);

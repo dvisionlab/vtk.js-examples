@@ -8,6 +8,9 @@ import vtkPiecewiseFunction from "vtk.js/Sources/Common/DataModel/PiecewiseFunct
 
 import vtkColorMaps from "vtk.js/Sources/Rendering/Core/ColorTransferFunction/ColorMaps";
 
+import vtkShaderProgram from "vtk.js/Sources/Rendering/OpenGL/ShaderProgram";
+window.vtkShaderProgram = vtkShaderProgram;
+
 // --- Set up our renderer ---
 
 // const container = document.querySelector('#container');
