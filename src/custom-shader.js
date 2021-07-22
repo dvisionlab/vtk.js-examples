@@ -36,6 +36,8 @@ const renderWindow = genericRenderWindow.getRenderWindow();
 
 const actor = vtkVolume.newInstance();
 const mapper = vtkVolumeMapper.newInstance();
+mapper.setSampleDistance(0.5);
+mapper.setMaximumSamplesPerRay(10000);
 
 // tell the actor which mapper to use
 actor.setMapper(mapper);

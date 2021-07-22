@@ -418,7 +418,7 @@ void applyLighting(inout vec3 tColor, vec4 normal)
 //=======================================================================
 // Given a texture value compute the color and opacity
 //
-vec4 getColorForValue(vec4 tValue, vec3 posIS, vec3 tstep)
+vec4 getColorForValue(vec4 tValue, vec3 posIS, vec3 tstep, vec3 cameraDir)
 {
 #ifdef vtkImageLabelOutlineOn
   vec3 centerPosIS = fragCoordToIndexSpace(gl_FragCoord); // pos in texture space
@@ -640,13 +640,19 @@ if (
   (posIS.x-.75)*(posIS.x-.75) + (posIS.y-.5)*(posIS.y-.5) + (posIS.z-.4)*(posIS.z-.4) < 0.001
   ){
     // tColor.r = 1.0;
-    // tColor.g = 0.9;
+    tColor.g = 1.0;
     // tColor.b = 1.0;
-    tColor.a = 0.25;
+    // tColor.a = 0.25;
   }
 else if (tColor.a > 0.0){
-  tColor.a = 0.01;
+  tColor.a = 0.05;
 }
+
+
+// vec4 normal0 = computeNormal(posIS, tValue.a, tstep);
+// if (dot(normal0.xyz, cameraDir) > 0.9){
+//   tColor.a = 0.0;
+// }
 
 // END DEV END DEV END DEV
 
@@ -678,7 +684,7 @@ bool valueWithinScalarRange(vec4 val, vec4 min, vec4 max) {
 //=======================================================================
 // Apply the specified blend mode operation along the ray's path.
 //
-void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
+void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims, vec3 camDir)
 {
   vec3 tstep = 1.0/tdims;
 
@@ -709,7 +715,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
 
   #if vtkBlendMode == 0 // COMPOSITE_BLEND
     // now map through opacity and color
-    tColor = getColorForValue(tValue, posIS, tstep);
+    tColor = getColorForValue(tValue, posIS, tstep, camDir);
 
     // handle very thin volumes
     if (raySteps <= 1.0)
@@ -731,7 +737,15 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
       tValue = getTextureValue(posIS);
 
       // now map through opacity and color
-      tColor = getColorForValue(tValue, posIS, tstep);
+      tColor = getColorForValue(tValue, posIS, tstep, camDir);
+
+      // DEV DEV DEV 
+      // if (tValue.a > 0.25 || (tValue.a < 0.1 && tValue.a > 0.09)){
+      //   tColor.a = 1.0;
+      //   // tColor.r = 1.0;
+      //   // tColor = vec4(0.0, 0.0, 0.0, 0.0);
+      // }
+      // END DEV END DEV
 
       float mix = (1.0 - color.a);
 
@@ -753,7 +767,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
       tValue = getTextureValue(posIS);
 
       // now map through opacity and color
-      tColor = getColorForValue(tValue, posIS, tstep);
+      tColor = getColorForValue(tValue, posIS, tstep, camDir);
       tColor.a = 1.0 - pow(1.0 - tColor.a, raySteps - stepsTraveled);
 
       float mix = (1.0 - color.a);
@@ -777,7 +791,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
     // we can skip the sampling loop along the ray.
     if (raySteps <= 1.0)
     {
-      gl_FragData[0] = getColorForValue(tValue, posIS, tstep);
+      gl_FragData[0] = getColorForValue(tValue, posIS, tstep, camDir);
       return;
     }
 
@@ -809,7 +823,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
     value = OP(tValue, value);
 
     // Now map through opacity and color
-    gl_FragData[0] = getColorForValue(value, posIS, tstep);
+    gl_FragData[0] = getColorForValue(value, posIS, tstep, camDir);
   #endif
   #if vtkBlendMode == 3 //AVERAGE_INTENSITY_BLEND
     vec4 averageIPScalarRangeMin = vec4 (
@@ -830,7 +844,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
     }
 
     if (raySteps <= 1.0) {
-      gl_FragData[0] = getColorForValue(sum, posIS, tstep);
+      gl_FragData[0] = getColorForValue(sum, posIS, tstep, camDir);
       return;
     }
 
@@ -875,7 +889,7 @@ void applyBlend(vec3 posIS, vec3 endIS, float sampleDistanceIS, vec3 tdims)
 
     sum /= vec4(stepsTraveled, stepsTraveled, stepsTraveled, 1.0);
 
-    gl_FragData[0] = getColorForValue(sum, posIS, tstep);
+    gl_FragData[0] = getColorForValue(sum, posIS, tstep, camDir);
   #endif
 }
 
@@ -998,6 +1012,16 @@ void computeIndexSpaceValues(out vec3 pos, out vec3 endPos, out float sampleDist
   sampleDistanceIS = sampleDistance*delta2/delta;
 }
 
+void app(vec3 vertex, vec3 ray)
+{
+  float a = dot(vertex, ray);
+
+  if (vertex.x > 0.0 && vertex.x < 110.0){
+    gl_FragData[0].a *= 0.9;
+  }
+
+}
+
 void main()
 {
 
@@ -1031,7 +1055,9 @@ void main()
   computeIndexSpaceValues(posIS, endIS, sampleDistanceIS, rayDirVC, rayStartEndDistancesVC);
 
   // Perform the blending operation along the ray
-  applyBlend(posIS, endIS, sampleDistanceIS, tdims);
+  applyBlend(posIS, endIS, sampleDistanceIS, tdims, rayDirVC);
+
+  app(vertexVCVSOutput, rayDirVC);
 }
 `;
 

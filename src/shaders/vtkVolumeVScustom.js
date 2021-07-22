@@ -31,6 +31,9 @@ void main() {
 vec4 dcsmall = vec4(dcxmin + 0.5 * (vertexDC.x + 1.0) * (dcxmax - dcxmin), dcymin + 0.5 * (vertexDC.y + 1.0) * (dcymax - dcymin), vertexDC.z, vertexDC.w);
 vec4 vcpos = PCVCMatrix * dcsmall;
 vertexVCVSOutput = vcpos.xyz / vcpos.w;
+
+dcsmall.x *= 2.0;
+
 gl_Position = dcsmall;
 }
 `;

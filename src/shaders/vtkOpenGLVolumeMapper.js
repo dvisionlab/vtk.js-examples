@@ -194,7 +194,8 @@ function vtkOpenGLVolumeMapper(publicAPI, model) {
     FSSource = vtkShaderProgram.substitute(
       FSSource,
       "//VTK::LightComplexity",
-      `#define vtkLightComplexity ${model.lastLightComplexity}`
+      // `#define vtkLightComplexity ${model.lastLightComplexity}`
+      `#define vtkLightComplexity 0`
     ).result;
 
     // if using gradient opacity define that
