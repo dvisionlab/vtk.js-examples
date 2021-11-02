@@ -23,7 +23,8 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "lodash": "^4.17.21",
-    "vtk.js": "^18.1.7"
+    "vtk.js": "^20.3.0",
+    "wslink": "^1.1.0"
   },
   "devDependencies": {
     "kw-web-suite": "^8.0.0"
