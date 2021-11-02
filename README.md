@@ -25,13 +25,12 @@ npm install
 
 Once you've run that, you can now run one of the example projects:
 - `npm run dev:cone`
-- `npm run dev:cone-filter`
-- `npm run dev:volume`
-- `npm run dev:volume-transfer`
-- `npm run dev:image-slicing`
-- `npm run dev:widgets`
-- `npm run dev:cornerstone`
 
 Running the above commands will use the webpack-dev-server, which will watch
 the transpiled files and reload the page whenever changes occur. Once run, you can see
 the results at http://localhost:8080/.
+
+## Remote rendering
+
+In order to run remote rendering example:
+`vtkpython ./vtkServer/vtk_server.py --port 1234` and open remoteRendering.html with any webServer (eg vscode liveServer or python http.server).
